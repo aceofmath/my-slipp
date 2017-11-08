@@ -104,4 +104,20 @@ public class UserController {
 		userRepository.save(user);
 		return "redirect:/users";
 	}
+	
+	@GetMapping("/profile/{id}")
+	public String profileForm(@PathVariable Long id, Model model, HttpSession session) {
+		if (!HttpSessionUtils.isLoginUser(session)) {
+			return "redirect:/users/loginForm";
+		}
+		
+		User sessionedUser = HttpSessionUtils.getUserFromSession(session);
+		if (!sessionedUser.matchId(id)) {
+			throw new IllegalStateException("You can't update the anther user");
+		}
+		
+		User user = userRepository.findOne(id);
+		model.addAttribute("user", user);
+		return "/user/profile";
+	}
 }
